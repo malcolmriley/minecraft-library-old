@@ -291,7 +291,7 @@ public final class Utilities {
 		 * @return A {@link Stream} over all {@link BlockPos} at most {@code radius} from the origin
 		 */
 		public static Stream<BlockPos> streamHorizontalRadius(BlockPos origin, int radius) {
-			return BlockPos.getAllInBox(origin.getX() + radius, origin.getY(), origin.getZ() + radius, origin.getX() - radius, origin.getY(), origin.getZ() - radius);
+			return BlockPos.getAllInBox(origin.getX() - radius, origin.getY(), origin.getZ() - radius, origin.getX() + radius, origin.getY(), origin.getZ() + radius);
 		}
 
 		/**
