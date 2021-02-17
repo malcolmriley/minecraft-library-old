@@ -20,6 +20,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag.INamedTag;
@@ -280,6 +281,17 @@ public final class Utilities {
 			ImmutableList.Builder<BlockPos> builder = new ImmutableList.Builder<>();
 			builder.add(position.up(), position.down(), position.north(), position.south(), position.east(), position.west());
 			return builder.build();
+		}
+		
+		/**
+		 * Streams all {@link BlockPos} in a horizontal cubic radius from the provided origin point.
+		 * 
+		 * @param origin - The origin point
+		 * @param radius - The radius, in blocks, within which {@link BlockPos} should be returned
+		 * @return A {@link Stream} over all {@link BlockPos} at most {@code radius} from the origin
+		 */
+		public static Stream<BlockPos> streamHorizontalRadius(BlockPos origin, int radius) {
+			return BlockPos.getAllInBox(origin.getX() + radius, origin.getY(), origin.getZ() + radius, origin.getX() - radius, origin.getY(), origin.getZ() - radius);
 		}
 
 		/**
