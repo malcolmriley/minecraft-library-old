@@ -33,6 +33,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -169,7 +170,7 @@ public final class Utilities {
 		 * @param icon - The {@link Supplier} from which an icon will be derived.
 		 * @return A suitable {@link ItemGroup} instance.
 		 */
-		public static ItemGroup createFrom(String name, Supplier<Item> icon) {
+		public static ItemGroup createGroupFrom(String name, Supplier<Item> icon) {
 			return new ItemGroup(name) {
 
 				@Override
@@ -178,6 +179,17 @@ public final class Utilities {
 				}
 				
 			};
+		}
+		
+		/**
+		 * Creates a new {@link ItemGroup} from the provided name and {@link RegistryObject} item reference.
+		 * 
+		 * @param name - The name for this {@link ItemGroup}
+		 * @param icon - The {@link RegistryObject} from which an icon will be derived.
+		 * @return A suitable {@link ItemGroup} instance.
+		 */
+		public static ItemGroup createGroupFrom(String name, RegistryObject<Item> icon) {
+			return Game.createGroupFrom(name, () -> icon.get());
 		}
 		
 		/**
