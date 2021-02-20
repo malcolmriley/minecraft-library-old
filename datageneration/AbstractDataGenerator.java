@@ -1,4 +1,4 @@
-package paragon.minecraft.library;
+package paragon.minecraft.library.datageneration;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,6 +18,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
 import net.minecraft.util.ResourceLocation;
+import paragon.minecraft.library.IRegistryNamed;
 
 /**
  * Partial implementation of a {@link IDataProvdier} for {@link IRegistryNamed} instances. Handles some boilerplate associated
