@@ -528,6 +528,16 @@ public final class Utilities {
 		private Strings() {}
 		
 		/**
+		 * Converts the passed {@link String} path into a {@link ResourceLocation} in the {@value #DOMAIN_MINECRAFT} namespace.
+		 * 
+		 * @param path - The resource path to use
+		 * @return A {@link ResourceLocation} in the {@value #DOMAIN_MINECRAFT} namespace.
+		 */
+		public static @Nonnull ResourceLocation minecraftResource(@Nonnull String path) {
+			return new ResourceLocation(DOMAIN_MINECRAFT, path);
+		}
+		
+		/**
 		 * Splits the passed {@link String} around occurrences of one or more whitespace characters,
 		 * returning the resulting array.
 		 * 
