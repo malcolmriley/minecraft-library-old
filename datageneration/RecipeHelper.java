@@ -7,6 +7,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
 import net.minecraft.item.Item;
+import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
@@ -61,6 +62,19 @@ public abstract class RecipeHelper extends RecipeProvider {
 	 */
 	protected static String criterionName(IItemProvider item) {
 		return RecipeHelper.createCriterionName(item.asItem());
+	}
+
+	/**
+	 * Helper method for creating a criterion name from the registry path of the passed {@link INamedTag}.
+	 * <p>
+	 * Will query {@link INamedTag#getName()} and then {@link ResourceLocation#getPath()} on the returned {@link ResourceLocation},
+	 * prefixing it with {@value #CRITERION_PREFIX}.
+	 *
+	 * @param item - The {@link INamedTag} to generate a "criterion name" from.
+	 * @return A {@link String} suitable for use as an advancement criterion name.
+	 */
+	protected static String criterionName(INamedTag<?> item) {
+		return CRITERION_PREFIX + item.getName().getPath();
 	}
 
 	/**
