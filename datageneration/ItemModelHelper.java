@@ -40,7 +40,20 @@ public abstract class ItemModelHelper extends ItemModelProvider {
 	 * @param name - The name of the parent block model.
 	 */
 	protected void blockItem(String name) {
-		this.getBuilder(name).parent(this.getExistingFile(this.modLoc(BLOCK_PREFIX + name)));
+		this.blockItem(name, name);
+	}
+
+	/**
+	 * Convenience method for creating a simple block-parented {@link Item} model.
+	 * <p>
+	 * The {@link ItemModelHelper} will look in the default location of the mod block model assets folder for
+	 * a block model with the provided parent name.
+	 * 
+	 * @param name - The name of the item
+	 * @param parentName - The name of the parent block model.
+	 */
+	protected void blockItem(String name, String parentName) {
+		this.getBuilder(name).parent(this.getExistingFile(this.modLoc(BLOCK_PREFIX + parentName)));
 	}
 	
 	/**
