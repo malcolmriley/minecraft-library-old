@@ -7,6 +7,7 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import paragon.minecraft.library.Utilities;
 
 /**
  * Data-Generator class for generating blockstate files and block models.
@@ -22,15 +23,37 @@ public abstract class BlockStateHelper extends BlockStateProvider {
 	
 	/* Internal Methods */
 
-	protected ConfiguredModel[] variants(Block baseBlock, int quantity) {
+	/**
+	 * Generates {@code quantity} texture-varying-only cube model files for the provided {@link Block}.
+	 * <p>
+	 * Calling this method expects the existence of textures of the format {@code path_N} where {@code path} is the value of {@link ResourceLocation#getPath()} on the provided {@link Block}'s registry name,
+	 * and {@code N} is the variant ordinal ranging from 1 to the passed value (inclusive).
+	 * <p>
+	 * 
+	 * @param baseBlock - The {@link Block} for which to add the texture variation
+	 * @param quantity - The quantity of texture variations
+	 * @return An array of cube {@link ConfiguredModel} with 
+	 */
+	protected ConfiguredModel[] cubesWithTextureVariants(Block baseBlock, int quantity) {
 		ConfiguredModel[] variants = new ConfiguredModel[quantity];
 		ResourceLocation name = baseBlock.getRegistryName();
 		for (int index = 1; index <= quantity; index += 1) {
-			final String variantName = ModelProvider.BLOCK_FOLDER + "/" + name.getPath() + "_" + index;
+			final String variantName = this.blockFolderTexture(name.getPath() + "_" + index);
 			ConfiguredModel model = ConfiguredModel.builder().modelFile(this.models().cubeAll(variantName, new ResourceLocation(name.getNamespace(), variantName))).buildLast();
 			variants[index - 1] = model;
 		}
 		return variants;
+	}
+	
+	/**
+	 * This method merely returns the passed {@link String} prefixed with the name of the {@link Block} texture directory and the path delimiter.
+	 * <p>
+	 * The formula is: {@value ModelProvider#BLOCK_FOLDER} + {@value Utilities.Strings#DELIMITER_PATH} + {@code path}.
+	 * @param path - The rest of the texture path to append
+	 * @return A {@link ResourceLocation}-friendly path within the {@link Block} textures subdirectory.
+	 */
+	protected String blockFolderTexture(String path) {
+		return ModelProvider.BLOCK_FOLDER + Utilities.Strings.DELIMITER_PATH + path;
 	}
 
 }
