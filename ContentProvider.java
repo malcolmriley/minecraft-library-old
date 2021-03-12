@@ -1,6 +1,6 @@
 package paragon.minecraft.library;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
