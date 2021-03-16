@@ -1,5 +1,7 @@
 package paragon.minecraft.library.capabilities;
 
+import java.util.Comparator;
+
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
@@ -44,14 +46,34 @@ public class InventoryHandler extends ItemStackHandler {
 		}
 		return remainder;
 	}
+	
+	/**
+	 * Sorts the internal {@link NonNullList} of {@link ItemStack} using the provided {@link Comparator}.
+	 * 
+	 * @param comparisonFunction - The {@link Comparator} to use for sorting.
+	 */
+	public void sortUsing(Comparator<? super ItemStack> comparisonFunction) {
+		this.getItems().sort(comparisonFunction);
+	}
+	
+	/**
+	 * Returns whether this {@link InventoryHandler} currently holds any {@link ItemStack}.
+	 * 
+	 * @return Whether this {@link InventoryHandler} is empty.
+	 */
+	public boolean isEmpty() {
+		return this.stacks.isEmpty();
+	}
 
 	/**
-	 * Returns the {@link NonNullList} of {@link ItemStack} backing this {@link InventoryHandler}.
+	 * Returns a copy of the {@link NonNullList} of {@link ItemStack} backing this {@link InventoryHandler}.
 	 *
-	 * @return The {@link NonNullList} of {@link ItemStack}s this {@link InventoryHandler} manages.
+	 * @return A copy of the {@link NonNullList} of {@link ItemStack}s this {@link InventoryHandler} manages.
 	 */
 	public NonNullList<ItemStack> getItems() {
-		return this.stacks;
+		NonNullList<ItemStack> clone = NonNullList.create();
+		this.stacks.forEach(stack -> clone.add(stack));
+		return clone;
 	}
 	
 	/**
