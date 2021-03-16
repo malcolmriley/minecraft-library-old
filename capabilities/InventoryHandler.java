@@ -53,7 +53,7 @@ public class InventoryHandler extends ItemStackHandler {
 	 * @param comparisonFunction - The {@link Comparator} to use for sorting.
 	 */
 	public void sortUsing(Comparator<? super ItemStack> comparisonFunction) {
-		this.getItems().sort(comparisonFunction);
+		this.stacks.sort(comparisonFunction);
 	}
 	
 	/**
@@ -70,10 +70,21 @@ public class InventoryHandler extends ItemStackHandler {
 	 *
 	 * @return A copy of the {@link NonNullList} of {@link ItemStack}s this {@link InventoryHandler} manages.
 	 */
-	public NonNullList<ItemStack> getItems() {
+	public NonNullList<ItemStack> copyItems() {
 		NonNullList<ItemStack> clone = NonNullList.create();
 		this.stacks.forEach(stack -> clone.add(stack));
 		return clone;
+	}
+
+	/**
+	 * Returns the {@link NonNullList} of {@link ItemStack} backing this {@link InventoryHandler}.
+	 * <p>
+	 * Care should be taken when using this method, and usage of {@link #copyItems()} should be preferred.
+	 * 
+	 * @return The {@link NonNullList} of {@link ItemStack}s this {@link InventoryHandler} manages.
+	 */
+	public NonNullList<ItemStack> getItems() {
+		return this.stacks;
 	}
 	
 	/**
