@@ -17,6 +17,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -25,6 +29,7 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
@@ -33,6 +38,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -677,6 +683,44 @@ public final class Utilities {
 			}
 		}
 
+	}
+
+	/**
+	 * Utility class for various UI-related utilities.
+	 * <p>
+	 * Not all methods in this class are client-only.
+	 * 
+	 * @author Malcolm Riley
+	 */
+	public static class UI {
+		
+		private UI() { }
+		
+		/**
+		 * Helper method to open the UI for a named-{@link Container}-providing {@link TileEntity} supposedly at
+		 * the indicated {@link BlockPos}.
+		 * <p>
+		 * If there is a {@link TileEntity} at the indicated {@link BlockPos} and it implements {@link INamedContainerProvider}, and furthermore if the passed 
+		 * {@link PlayerEntity} is also be an instance of {@link ServerPlayerEntity}, then {@link NetworkHooks#openGui(ServerPlayerEntity, INamedContainerProvider, BlockPos)}
+		 * is called and the method returns {@code true}.
+		 * In all other cases, the method returns {@code false}.
+		 * 
+		 * @param player - The player opening the UI
+		 * @param world - The {@link World} containing the {@link TileEntity}
+		 * @param position - The {@link BlockPos} of the {@link TileEntity}
+		 * @return {@code true} if an attempt was made to open the UI, and {@code false} otherwise.
+		 */
+		public static boolean openUIFor(PlayerEntity player, World world, BlockPos position) {
+			final TileEntity discovered = world.getTileEntity(position);
+			if (discovered instanceof INamedContainerProvider && player instanceof ServerPlayerEntity) {
+				final ServerPlayerEntity serverPlayer = (ServerPlayerEntity)player;
+				final INamedContainerProvider provider = (INamedContainerProvider)discovered;
+				NetworkHooks.openGui(serverPlayer, provider, position);
+				return true;
+			}
+			return false;
+		}
+		
 	}
 
 }
