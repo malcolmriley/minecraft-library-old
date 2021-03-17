@@ -1,4 +1,4 @@
-package paragon.minecraft.library;
+package paragon.minecraft.library.client;
 
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
