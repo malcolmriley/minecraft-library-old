@@ -523,6 +523,7 @@ public final class Utilities {
 		/* Constants */
 		public static final String DOMAIN_FORGE = "forge";
 		public static final String DOMAIN_MINECRAFT = "minecraft";
+		public static final String FILE_SUFFIX_PNG = "png";
 
 		public static final String EMPTY = "";
 		public static final String[] EMPTY_ARRAY = {};
@@ -584,6 +585,62 @@ public final class Utilities {
 		 */
 		public static String path(String... elements) {
 			return Strings.concatenate(DELIMITER_PATH, elements);
+		}
+		
+		/**
+		 * Concatenates the passed {@link String}s with {@link #DELIMITER_PATH} betwixt, and appends the {@value #FILE_SUFFIX_PNG} file suffix to the end.
+		 * <p>
+		 * Suitable for use as an explicit path to a texture resource.
+		 * 
+		 * @param elements - The {@link String}s to concatenate
+		 * @return A suitably-concatenated {@link String}.
+		 */
+		public static String texturePath(Iterable<String> elements) {
+			return Strings.filePath(FILE_SUFFIX_PNG, elements);
+		}
+
+		/**
+		 * Concatenates the passed {@link String}s with {@link #DELIMITER_PATH} betwixt, and appends the {@value #FILE_SUFFIX_PNG} file suffix to the end.
+		 * <p>
+		 * Suitable for use as an explicit path to a texture resource.
+		 * 
+		 * @param elements - The {@link String}s to concatenate
+		 * @return A suitably-concatenated {@link String}.
+		 */
+		public static String texturePath(String ... elements) {
+			return Strings.filePath(FILE_SUFFIX_PNG, elements);
+		}
+
+		/**
+		 * Concatenates the passed {@link String}s with {@link #DELIMITER_PATH} betwixt, and appends the file suffix to the end.
+		 * <p>
+		 * Suitable for use as an explicit path to a file asset.
+		 *
+		 * @param suffix - The file suffix to append
+		 * @param elements - The {@link String}s to concatenate
+		 * @return A suitably-concatenated {@link String}.
+		 */
+		public static String filePath(String suffix, Iterable<String> elements) {
+			StringBuilder builder = new StringBuilder();
+			Strings.concatenateUsing(builder, DELIMITER_PATH, elements);
+			builder.append(DELIMITER_TYPE).append(FILE_SUFFIX_PNG);
+			return builder.toString();
+		}
+
+		/**
+		 * Concatenates the passed {@link String}s with {@link #DELIMITER_PATH} betwixt, and appends the file suffix to the end.
+		 * <p>
+		 * Suitable for use as an explicit path to a file asset.
+		 *
+		 * @param suffix - The file suffix to append
+		 * @param elements - The {@link String}s to concatenate
+		 * @return A suitably-concatenated {@link String}.
+		 */
+		public static String filePath(String suffix, String... elements) {
+			StringBuilder builder = new StringBuilder();
+			Strings.concatenateUsing(builder, DELIMITER_PATH, elements);
+			builder.append(DELIMITER_TYPE).append(FILE_SUFFIX_PNG);
+			return builder.toString();
 		}
 
 		/**
