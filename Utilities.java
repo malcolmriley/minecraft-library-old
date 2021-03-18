@@ -16,16 +16,21 @@ import com.google.common.collect.Streams;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.tags.ItemTags;
@@ -95,6 +100,44 @@ public final class Utilities {
 			return MathHelper.floor(Time.TICKS_PER_SECOND * 60 * minutes);
 		}
 
+	}
+	
+	/**
+	 * Container for {@link BlockState}-related static helper methods.
+	 */
+	public static final class States {
+		
+		private States() { }
+		
+		/**
+		 * Applies a waterlog state to the incoming {@link BlockState} derived from the provided {@link BlockItemUseContext}.
+		 * <p>
+		 * Intended for use within {@link Block#getStateForPlacement(BlockItemUseContext)}.
+		 * 
+		 * @param context - The use context for the {@link BlockState}
+		 * @param incoming - The inbound {@link BlockState}
+		 * @return The {@link BlockState} with waterlog properties applied.
+		 */
+		public static BlockState applyWaterlogPlacementState(BlockItemUseContext context, BlockState incoming) {
+			Fluid fluid = context.getWorld().getFluidState(context.getPos()).getFluid();
+			return incoming.with(BlockStateProperties.WATERLOGGED, Boolean.valueOf((fluid == Fluids.WATER) || (fluid == Fluids.FLOWING_WATER)));
+		}
+		
+		/**
+		 * Convenience method to queue a fluid tick post-placement if the provided {@link BlockState} is waterlogged.
+		 * <p>
+		 * Intended for use within {@link Block#updatePostPlacement(BlockState, Direction, BlockState, IWorld, BlockPos, BlockPos)}.
+		 * 
+		 * @param state - The world {@link BlockState}
+		 * @param world - The world reference
+		 * @param position - The position of the {@link BlockState}
+		 */
+		public static void applyWaterlogPostPlacement(BlockState state, IWorld world, BlockPos position) {
+			if (state.get(BlockStateProperties.WATERLOGGED).booleanValue()) {
+				world.getPendingFluidTicks().scheduleTick(position, Fluids.WATER, Fluids.WATER.getTickRate(world));
+			}
+		}
+		
 	}
 
 	public static class Misc {
