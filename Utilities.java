@@ -412,6 +412,22 @@ public final class Utilities {
 		}
 
 		/**
+		 * Calls {@link #spawnItem(World, ItemStack, double, double, double)} with a slightly-randomized offset for each coordinate.
+		 *
+		 * @param world - The world to spawn the {@link ItemEntity} in
+		 * @param item - The {@link ItemStack} that the {@link ItemEntity} should contain
+		 * @param position - The coordinates to spawn at
+		 * @param item - The items to spawn
+		 * @param RNG - The {@link Random} instance to use
+		 * @param spread - The maximum offset from the passed position
+		 * @return The created {@link ItemEntity} or {@code null}, as described by {@link #spawnItem(World, ItemStack, double, double, double)}.
+		 * @see #spawnItem(World, ItemStack, double, double, double)
+		 */
+		public static @Nullable ItemEntity spawnItemNear(IWorld world, @Nullable ItemStack item, Vector3i position, Random RNG, double spread) {
+			return Game.spawnItem(world, item, position.getX() + 0.5D + Game.getOffset(RNG, spread), position.getY() + 0.5D + Game.getOffset(RNG, spread), position.getZ() + 0.5D + Game.getOffset(RNG, spread));
+		}
+
+		/**
 		 * Spawns the passed {@link ItemStack} in the world as an {@link ItemEntity} at the indicated coordinates and with the default item pickup delay (10 ticks).
 		 * If the {@link ItemStack} is {@code null} or returns {@code true} for {@link ItemStack#isEmpty()}, this method will perform no action and return {@code null}.
 		 * Otherwise, it will return the created {@link ItemEntity}.
