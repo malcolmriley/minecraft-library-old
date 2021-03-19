@@ -3,6 +3,8 @@ package paragon.minecraft.library.datageneration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.data.RecipeProvider;
@@ -33,6 +35,30 @@ public abstract class RecipeHelper extends RecipeProvider {
 	public abstract void registerRecipes(final Consumer<IFinishedRecipe> registrar);
 
 	/* Utility Methods */
+
+	/**
+	 * Convenience method to create an {@link InventoryChangeTrigger.Instance} for the possesion of the {@link Item} contained in the provided {@link RegistryObject}.
+	 * <p>
+	 * Simply calls {@link RegistryObject#get()} and provides the result to {@link RecipeHelper#hasItem(IItemProvider)}.
+	 * 
+	 * @param registryObject - The {@link RegistryObject} containing the desired {@link Item}
+	 * @return A suitable {@link InventoryChangeTrigger.Instance}
+	 */
+	protected static InventoryChangeTrigger.Instance hasItem(RegistryObject<Item> registryObject) {
+		return RecipeHelper.hasItem(registryObject.get());
+	}
+	
+	/**
+	 * Convenience method to create an {@link InventoryChangeTrigger.Instance} for the possesion of the {@link Block} contained in the provided {@link RegistryObject}.
+	 * <p>
+	 * Simply calls {@link RegistryObject#get()} and provides the result to {@link RecipeHelper#hasItem(IItemProvider)}.
+	 * 
+	 * @param registryObject - The {@link RegistryObject} containing the desired {@link Block}
+	 * @return A suitable {@link InventoryChangeTrigger.Instance}
+	 */
+	protected static InventoryChangeTrigger.Instance hasBlock(RegistryObject<Block> registryObject) {
+		return RecipeHelper.hasItem(registryObject.get());
+	}
 
 	/**
 	 * Helper method for creating a recipe name automatically from the passed two components.
