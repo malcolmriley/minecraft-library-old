@@ -68,4 +68,45 @@ public abstract class ItemModelHelper extends ItemModelProvider {
 		this.getBuilder(name).parent(GENERATED).texture(TEXTURE_DEFAULT, this.modLoc(ITEM_PREFIX + name));
 	}
 
+	/**
+	 * Creates a model for a Stair {@link BlockItem} wherein the parent model location is the concatenation of the provided name suffixed with {@code "1"}.
+	 * 
+	 * @param parentBlock - The name of the parent model file
+	 */
+	protected void variantBlockItem(String parentBlock) {
+		this.variantBlockItem(parentBlock, "1");
+	}
+
+	/**
+	 * Creates a model for a Slab {@link BlockItem} wherein the parent model location is the concatenation of the provided name suffixed with {@code "bottom_1"}.
+	 * <p>
+	 * This will be the suffix of the "normal" slab model if utilizing the standard model generation.
+	 * 
+	 * @param parentBlock - The name of the parent model file
+	 */
+	protected void variantSlab(String parentBlock) {
+		this.variantBlockItem(parentBlock, "bottom_1");
+	}
+
+	/**
+	 * Creates a model for a Stair {@link BlockItem} wherein the parent model location is the concatenation of the provided name suffixed with {@code "normal_1"}.
+	 * <p>
+	 * This will be the suffix of the "normal" stair model if utilizing the standard model generation.
+	 * 
+	 * @param parentBlock - The name of the parent model file
+	 */
+	protected void variantStair(String parentBlock) {
+		this.variantBlockItem(parentBlock, "normal_1");
+	}
+
+	/**
+	 * Creates a model for a {@link BlockItem} wherein the parent model location is the concatenation of the provided name with the provided variant {@link String}, with {@value Utilities.Strings#DELIMITER_NAME} betwixt.
+	 * 
+	 * @param parentBlock - The name of the parent model file
+	 * @param variant - The model file "variant" suffix.
+	 */
+	protected void variantBlockItem(String parentBlock, String variant) {
+		this.blockItem(parentBlock, Utilities.Strings.name(parentBlock, variant));
+	}
+
 }
