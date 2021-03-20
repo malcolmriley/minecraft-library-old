@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.mojang.datafixers.util.Pair;
@@ -21,6 +22,7 @@ import net.minecraft.loot.LootTable.Builder;
 import net.minecraft.loot.LootTableManager;
 import net.minecraft.loot.ValidationTracker;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.RegistryObject;
 
 /**
  * Data-generator class for assisting with generating JSON {@link LootTable}.
@@ -64,6 +66,8 @@ public abstract class LootHelper extends LootTableProvider {
 	 * Data generation helper for {@link Block} loot tables
 	 */
 	public static abstract class BlockLoot extends BlockLootTables {
+		
+		/* Abstract Methods */
 
 		/**
 		 * This method should be used to register loot tables.
@@ -77,6 +81,33 @@ public abstract class LootHelper extends LootTableProvider {
 		@Override
 		protected abstract Iterable<Block> getKnownBlocks();
 		
+		/* Internal Methods */
+		
+		/**
+		 * Convenience method to register a loot table for the {@link Block} within the provided {@link RegistryObject}, if {@link RegistryObject#isPresent()} is {@code TRUE}.
+		 * <p>
+		 * Merely calls {@link RegistryObject#isPresent()}, and if {@code TRUE}, then calls {@link BlockLootTables#registerLootTable(Block, Builder)} using {@link RegistryObject#get()}.
+		 * @param registryObject - The {@link RegistryObject} containing the {@link Block} to add a {@link LootTable} for
+		 * @param builder - The builder for the {@link LootTable}
+		 */
+		protected void addLootFor(RegistryObject<Block> registryObject, LootTable.Builder builder) {
+			if (registryObject.isPresent()) {
+				this.registerLootTable(registryObject.get(), builder);
+			}
+		}
+
+		/**
+		 * Convenience method to register a loot table for the {@link Block} within the provided {@link RegistryObject}, if {@link RegistryObject#isPresent()} is {@code TRUE}.
+		 * <p>
+		 * Merely calls {@link RegistryObject#isPresent()}, and if {@code TRUE}, then calls {@link BlockLootTables#registerLootTable(Block, Function)} using {@link RegistryObject#get()}.
+		 * @param registryObject - The {@link RegistryObject} containing the {@link Block} to add a {@link LootTable} for
+		 * @param builderFunction - The function providing the {@link LootTable.Builder} for the {@link LootTable}
+		 */
+		protected void addLootFor(RegistryObject<Block> registryObject, Function<Block, LootTable.Builder> builderFunction) {
+			if (registryObject.isPresent()) {
+				this.registerLootTable(registryObject.get(), builderFunction);
+			}
+		}
 	}
 
 }
