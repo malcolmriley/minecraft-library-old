@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
@@ -108,6 +109,17 @@ public abstract class LootHelper extends LootTableProvider {
 				this.registerLootTable(registryObject.get(), builderFunction);
 			}
 		}
+		
+		/**
+		 * Convenience method that simply calls {@link #registerDropSelfLootTable(Block)} on each provided non-empty {@link RegistryObject}.
+		 * 
+		 * @param registryObjects - A list of {@link RegistryObject} to add self-drop loot tables for
+		 */
+		@SafeVarargs // Mere iterate and fetch. Should not used in runtime code anyways.
+		protected final void dropSelf(RegistryObject<Block> ... registryObjects) {
+			Stream.of(registryObjects).filter(RegistryObject::isPresent).forEach(element -> this.registerDropSelfLootTable(element.get()));
+		}
+		
 	}
 
 }
