@@ -110,6 +110,18 @@ public final class Utilities {
 		private States() { }
 		
 		/**
+		 * Deduces the horizontal-only facing from the provided {@link BlockItemUseContext}.
+		 * <p>
+		 * If the facing is {@value Direction#UP} or {@value Direction#DOWN}, returns {@link BlockItemUseContext#getPlacementHorizontalFacing()}; otherwise returns {@link BlockItemUseContext#getFace()}.
+		 * 
+		 * @param context - The context to deduce the facing from
+		 * @return The block placement facing direction.
+		 */
+		public static Direction deduceHorizontalFacing(BlockItemUseContext context) {
+			return (context.getFace() == Direction.UP) || (context.getFace() == Direction.DOWN) ? context.getPlacementHorizontalFacing() : context.getFace();
+		}
+		
+		/**
 		 * Applies a waterlog state to the incoming {@link BlockState} derived from the provided {@link BlockItemUseContext}.
 		 * <p>
 		 * Intended for use within {@link Block#getStateForPlacement(BlockItemUseContext)}.
