@@ -41,6 +41,7 @@ import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -108,6 +109,18 @@ public final class Utilities {
 	public static final class States {
 		
 		private States() { }
+		
+		/**
+		 * Convenience method that returns whether the {@link BlockState} below the provided {@link BlockPos} has a solid upward surface, via {@link BlockState#isSolidSide(IBlockReader, BlockPos, Direction)}.
+		 * 
+		 * @param world - The {@link IBlockReader} to use for {@link BlockState} access
+		 * @param position - The position above the queried block
+		 * @return Whether the {@link BlockState} below the provided {@link BlockPos} has a solid upward surface.
+		 */
+		public static boolean isBlockBelowSolidAbove(IBlockReader world, BlockPos position) {
+			BlockPos below = position.down();
+			return world.getBlockState(below).isSolidSide(world, below, Direction.UP);
+		}
 		
 		/**
 		 * Deduces the horizontal-only facing from the provided {@link BlockItemUseContext}.
