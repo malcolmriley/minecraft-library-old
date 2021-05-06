@@ -535,6 +535,42 @@ public final class Utilities {
 			Strings.concatenateUsing(builder, Strings.DELIMITER_PATH, path);
 			return builder.toString();
 		}
+		
+		/**
+		 * Convenience method to create a Forge-domain "ingot" tag.
+		 * <p>
+		 * The resulting tag will be in {@code data.forge.tags.items.ingot}.
+		 * 
+		 * @param type - The type of ingot
+		 * @return A suitable {@link INamedTag}.
+		 */
+		public static INamedTag<Item> createIngotTag(String type) {
+			return Tags.forgeItemTag("ingot", type);
+		}
+		
+		/**
+		 * Convenience method to create a Forge-domain "nugget" tag.
+		 * <p>
+		 * The resulting tag will be in {@code data.forge.tags.items.nugget}.
+		 * 
+		 * @param type - The type of ingot
+		 * @return A suitable {@link INamedTag}.
+		 */
+		public static INamedTag<Item> createNuggetTag(String type) {
+			return Tags.forgeItemTag("nugget", type);
+		}
+		
+		/**
+		 * Convenience method to create a Forge-domain "block" tag.
+		 * <p>
+		 * The resulting tag will be in {@code data.forge.tags.items.block}.
+		 * 
+		 * @param type - The type of ingot
+		 * @return A suitable {@link INamedTag}.
+		 */
+		public static INamedTag<Item> createBlockTag(String type) {
+			return Tags.forgeItemTag("block", type);
+		}
 
 		/**
 		 * Gets or creates an {@link INamedTag} in the Minecraft Forge domain with the passed "path".
