@@ -14,6 +14,7 @@ import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import paragon.minecraft.library.Utilities;
 
 /**
  * Data-Generator class for generating {@link IFinishedRecipe}.
@@ -74,7 +75,24 @@ public abstract class RecipeHelper extends RecipeProvider {
 	 * @return A {@link ResourceLocation} suitable for use as the name of an {@link IFinishedRecipe}.
 	 */
 	protected static ResourceLocation nameFromIngredients(Function<String, ResourceLocation> transformer, IItemProvider output, IItemProvider input) {
-		return transformer.apply(RecipeHelper.registryPathOf(output) + "_from_" + RecipeHelper.registryPathOf(input));
+		return RecipeHelper.nameFrom(transformer, output, RecipeHelper.registryPathOf(input));
+	}
+	
+	/**
+	 * Helper method for creating a recipe name automatically from the passed two components.
+	 * <p>
+	 * The path of the resulting {@link ResourceLocation} will be the result of concatenating the registry path of the output {@link IItemProvider}'s {@link Item}, then the {@link String} literal {@code "_from_"}, and then
+	 * the value of {@code outputSource}.
+	 * <p>
+	 * The first parameter, the {@link Function} must be a means of transforming a {@link String} registry path into a domain-qualified {@link ResourceLocation}.
+	 *
+	 * @param transformer - A path-to-qualified-domain transformer
+	 * @param output - An "output" {@link IItemProvider}
+	 * @param outputSource - The "source" of the output item
+	 * @return A {@link ResourceLocation} suitable for use as the name of an {@link IFinishedRecipe}.
+	 */
+	protected static ResourceLocation nameFrom(Function<String, ResourceLocation> transformer, IItemProvider output, String outputSource) {
+		return transformer.apply(Utilities.Strings.name(RecipeHelper.registryPathOf(output), "from", outputSource));
 	}
 
 	/**
