@@ -571,6 +571,18 @@ public final class Utilities {
 		public static INamedTag<Item> createBlockTag(String type) {
 			return Tags.forgeItemTag("block", type);
 		}
+		
+		/**
+		 * Convenience method to create a Forge-domain "ore" tag.
+		 * <p>
+		 * The resulting tag will be in {@code data.forge.tags.items.ore}.
+		 * 
+		 * @param type - The type of ingot
+		 * @return A suitable {@link INamedTag}.
+		 */
+		public static INamedTag<Item> createOreTag(String type) {
+			return Tags.forgeItemTag("ore", type);
+		}
 
 		/**
 		 * Gets or creates an {@link INamedTag} in the Minecraft Forge domain with the passed "path".
