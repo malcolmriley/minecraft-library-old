@@ -561,7 +561,7 @@ public final class Utilities {
 		}
 		
 		/**
-		 * Convenience method to create a Forge-domain "block" tag.
+		 * Convenience method to create a Forge-domain "storage_blocks" tag.
 		 * <p>
 		 * The resulting tag will be in {@code data.forge.tags.items.block}.
 		 * 
@@ -569,7 +569,7 @@ public final class Utilities {
 		 * @return A suitable {@link INamedTag}.
 		 */
 		public static INamedTag<Item> createBlockTag(String type) {
-			return Tags.forgeItemTag("block", type);
+			return Tags.forgeItemTag("storage_blocks", type);
 		}
 		
 		/**
