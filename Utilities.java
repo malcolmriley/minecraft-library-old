@@ -335,6 +335,32 @@ public final class Utilities {
 		public static Stream<BlockPos> streamOrthogonalNeighbors(BlockPos origin) {
 			return Stream.of(origin.up(), origin.down(), origin.north(), origin.south(), origin.east(), origin.west());
 		}
+		
+		/**
+		 * Returns a {@link Stream} of all horizontal neighbors of the passed {@link BlockPos}.
+		 * <p>
+		 * Iteration order is NORTH, EAST, SOUTH, WEST.
+		 * 
+		 * @param position - The origin {@link BlockPos}
+		 * @return All orthogonal neighbors of the origin.
+		 */
+		public static Stream<BlockPos> streamHorizontalNeighbors(BlockPos position) {
+			return Stream.of(position.north(), position.east(), position.south(), position.west());
+		}
+		
+		/**
+		 * Returns a {@link Stream} of all horizontal neighbors of the passed {@link BlockPos}.
+		 * <p>
+		 * Iteration order is NORTH, EAST, SOUTH, WEST.
+		 * 
+		 * @param position - The origin {@link BlockPos}
+		 * @return All orthogonal neighbors of the origin.
+		 */
+		public static Iterable<BlockPos> horizontalNeighbors(BlockPos position) {
+			ImmutableList.Builder<BlockPos> builder = new ImmutableList.Builder<>();
+			builder.add(position.north(), position.east(), position.south(), position.west());
+			return builder.build();
+		}
 
 		/**
 		 * Returns an {@link Iterable} over all orthogonal neighbors of the passed {@link BlockPos}.
