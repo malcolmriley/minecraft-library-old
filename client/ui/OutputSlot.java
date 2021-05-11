@@ -10,13 +10,13 @@ import net.minecraft.item.ItemStack;
  * 
  * @author Malcolm Riley
  */
-public class CraftResultSlot extends Slot {
+public class OutputSlot extends Slot {
 
 	/* Internal Fields */
 	private final PlayerEntity PLAYER;
 	private int removalCount;
 
-	public CraftResultSlot(PlayerEntity player, IInventory inventory, int index, int xPosition, int yPosition) {
+	public OutputSlot(PlayerEntity player, IInventory inventory, int index, int xPosition, int yPosition) {
 		super(inventory, index, xPosition, yPosition);
 		this.PLAYER = player;
 	}
