@@ -42,7 +42,7 @@ import net.minecraftforge.registries.RegistryBuilder;
  * @author Malcolm Riley
  * @param <T> The {@link IForgeRegistryEntry} type managed by this registrar.
  */
-public abstract class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IEventBusListener {
+public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IEventBusListener {
 
 	/* Shared Static Fields */
 	protected static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).disableHtmlEscaping().setPrettyPrinting().create();
