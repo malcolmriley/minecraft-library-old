@@ -1,5 +1,7 @@
 package paragon.minecraft.library.datageneration;
 
+import java.util.function.Supplier;
+
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.util.ResourceLocation;
@@ -7,6 +9,7 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.fml.RegistryObject;
 import paragon.minecraft.library.Utilities;
 
 /**
@@ -54,6 +57,17 @@ public abstract class BlockStateHelper extends BlockStateProvider {
 	 */
 	protected String blockFolderTexture(String path) {
 		return ModelProvider.BLOCK_FOLDER + Utilities.Strings.DELIMITER_PATH + path;
+	}
+	
+	/**
+	 * Convenience method that simply invokes {@link Supplier#get()}, and then {@link #simpleBlock(Block)} using the result.
+	 * <p>
+	 * Intended for use with {@link RegistryObject} references.
+	 * 
+	 * @param blockSupplier - The {@link Supplier} to query
+	 */
+	protected void simpleBlock(Supplier<Block> blockSupplier) {
+		this.simpleBlock(blockSupplier.get());
 	}
 
 }

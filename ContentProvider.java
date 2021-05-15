@@ -1,6 +1,7 @@
 package paragon.minecraft.library;
 
-import com.google.common.base.Supplier;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.RegistryObject;
@@ -31,6 +32,30 @@ public abstract class ContentProvider<T extends IForgeRegistryEntry<T>> implemen
 	 */
 	public void registerTo(IEventBus bus) {
 		this.ALL.register(bus);
+	}
+	
+	/**
+	 * Returns an {@link Iterable} over all non-null content instances held by this {@link ContentProvider}.
+	 * <p>
+	 * {@link ContentProvider} may hold {@link RegistryObject} that return {@code FALSE} for {@link RegistryObject#isPresent()}; such
+	 * instances are already filtered out by this method.
+	 * 
+	 * @return An {@link Iterable} over all non-null content instances.
+	 */
+	public Iterable<T> iterateContent() {
+		return () -> this.streamContent().iterator();
+	}
+
+	/**
+	 * Returns an {@link Stream} over all non-null content instances held by this {@link ContentProvider}.
+	 * <p>
+	 * {@link ContentProvider} may hold {@link RegistryObject} that return {@code FALSE} for {@link RegistryObject#isPresent()}; such
+	 * instances are already filtered out by this method.
+	 * 
+	 * @return An {@link Stream} over all non-null content instances.
+	 */
+	public Stream<T> streamContent() {
+		return this.ALL.getEntries().stream().filter(entry -> entry.isPresent()).map(entry -> entry.get());
 	}
 
 	/* Internal Methods */

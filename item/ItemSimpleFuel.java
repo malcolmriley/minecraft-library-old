@@ -1,4 +1,4 @@
-package paragon.minecraft.library;
+package paragon.minecraft.library.item;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
