@@ -28,6 +28,7 @@ import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.DeferredRegister;
@@ -219,7 +220,7 @@ public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IE
 		
 		/* Event Methods */
 		
-		@SubscribeEvent
+		@SubscribeEvent(priority = EventPriority.LOWEST)
 		public void onAddReloadListener(AddReloadListenerEvent event) {
 			event.addListener(this);
 		}
