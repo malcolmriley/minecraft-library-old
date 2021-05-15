@@ -27,7 +27,9 @@ import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -213,6 +215,13 @@ public abstract class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> impl
 			this.DECODER = Objects.requireNonNull(codec);
 			this.REGISTRAR = Objects.requireNonNull(registrar);
 			this.LOGGER = Objects.requireNonNull(logger);
+		}
+		
+		/* Event Methods */
+		
+		@SubscribeEvent
+		public void onAddReloadListener(AddReloadListenerEvent event) {
+			event.addListener(this);
 		}
 
 		/* Supertype Override Methods */
