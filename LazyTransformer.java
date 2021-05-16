@@ -32,6 +32,21 @@ public class LazyTransformer<I, O> {
 		this.LOOKUP = Objects.requireNonNull(lookup);
 	}
 	
+	/**
+	 * Creates a new {@link LazyTransformer} with the given source.
+	 * 
+	 * @param <V> The source type
+	 * @param <K> The result type
+	 * @param lookup - The lookup method
+	 * @param source - The source element
+	 * @return A suitably-instantiated {@link LazyTransformer}
+	 */
+	public static <V, K> LazyTransformer<V, K> create(Function<V, K> lookup, V source) {
+		LazyTransformer<V, K> transformer = new LazyTransformer<>(lookup);
+		transformer.setSource(source);
+		return transformer;
+	}
+	
 	/* Public Methods */
 	
 	/**
