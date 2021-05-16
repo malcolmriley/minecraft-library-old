@@ -36,6 +36,7 @@ import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.math.BlockPos;
@@ -252,6 +253,22 @@ public final class Utilities {
 				}
 
 			};
+		}
+		
+		/**
+		 * Returns the {@link Vector3i} component corresponding to the provided {@link Axis}.
+		 * 
+		 * @param position - The vector to query
+		 * @param axis - The axis to examine
+		 * @return The component of the provided {@link Vector3i} corresponding to the provided {@link Axis}.
+		 */
+		public static int componentFrom(final Vector3i position, final Axis axis) {
+			switch(axis) {
+				case X : return position.getX();
+				case Y : return position.getY();
+				case Z : return position.getZ();
+			}
+			return 0;
 		}
 
 		/**
