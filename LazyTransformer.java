@@ -41,13 +41,25 @@ public class LazyTransformer<I, O> {
 	 * @param source - The source element
 	 * @return A suitably-instantiated {@link LazyTransformer}
 	 */
-	public static <V, K> LazyTransformer<V, K> create(Function<V, K> lookup, V source) {
+	public static <V, K> LazyTransformer<V, K> create(Function<V, K> lookup, @Nullable V source) {
 		LazyTransformer<V, K> transformer = new LazyTransformer<>(lookup);
 		transformer.setSource(source);
 		return transformer;
 	}
 	
 	/* Public Methods */
+	
+	/**
+	 * Returns an {@link Optional} containing the source object for this {@link LazyTransformer}.
+	 * <p>
+	 * The returned {@link Optional} will be empty if {@link #setSource(Object)} has not been called, or if it
+	 * has been called with {@code null}.
+	 * 
+	 * @return An {@link Optional} containing the source object, if any.
+	 */
+	public Optional<I> getSource() {
+		return this.source;
+	}
 	
 	/**
 	 * Sets the "source" object of this {@link LazyTransformer} that will be used when {@link #procure()} is called
