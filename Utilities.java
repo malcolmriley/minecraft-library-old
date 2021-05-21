@@ -35,6 +35,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.ResourceLocation;
@@ -942,6 +943,24 @@ public final class Utilities {
 				return true;
 			}
 			return false;
+		}
+		
+		/**
+		 * Helper method that can be used as a stand-in for {@link Block#onBlockActivated(BlockState, World, BlockPos, PlayerEntity, net.minecraft.util.Hand, net.minecraft.util.math.BlockRayTraceResult)}.
+		 * <p>
+		 * If the provided {@link World} is not remote, calls {@link #openUIFor(PlayerEntity, World, BlockPos)}, returning {@link ActionResultType#SUCCESS} for a successful UI opening and {@link ActionResultType#CONSUME} for failure.
+		 * 
+		 * @see #openUIFor(PlayerEntity, World, BlockPos)
+		 * @param player - The player opening the UI
+		 * @param world - The {@link World} containing the {@link TileEntity}
+		 * @param position - The {@link BlockPos} of the {@link TileEntity}
+		 * @return {@link ActionResultType#SUCCESS} if the UI was opened, {@link ActionResultType#CONSUME} if the UI was not, and {@link ActionResultType#SUCCESS} on the standalone client always.
+		 */
+		public static ActionResultType openBlockUIFor(PlayerEntity player, World world, BlockPos position) {
+			if (!world.isRemote()) {
+				return UI.openUIFor(player, world, position) ? ActionResultType.SUCCESS : ActionResultType.CONSUME;
+			}
+			return ActionResultType.func_233537_a_(world.isRemote());
 		}
 
 	}
