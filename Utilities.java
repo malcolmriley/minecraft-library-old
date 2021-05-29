@@ -564,6 +564,67 @@ public final class Utilities {
 	public static final class Tags {
 
 		private Tags() {}
+		
+		/**
+		 * Convenience method to determine whether the provided {@link BlockState} has the {@link ITag} corresponding to the provided tag name.
+		 * <p>
+		 * Calls {@link Tags#hasTag(Block, ResourceLocation)} using {@link BlockState#getBlock()}, returning the result.
+		 * 
+		 * @param state - The {@link BlockState} to examine
+		 * @param tagName - The ID of the {@link ITag}
+		 * @return Whether the {@link BlockState} has the identified {@link ITag}.
+		 */
+		public static boolean hasTag(@Nonnull BlockState state, ResourceLocation tagName) {
+			return Tags.hasTag(state.getBlock(), tagName);
+		}
+		
+		/**
+		 * Convenience method to determine whether the provided {@link Block} has the {@link ITag} corresponding to the provided tag name.
+		 * 
+		 * @param block - The {@link Block} to examine
+		 * @param tagName - The ID of the {@link ITag}
+		 * @return Whether the {@link Block} has the identified {@link ITag}.
+		 */
+		public static boolean hasTag(@Nonnull Block block, ResourceLocation tagName) {
+			return block.getTags().contains(tagName);
+		}
+
+		/**
+		 * Convenience method to determine whether the provided {@link ItemStack} has the {@link ITag} corresponding to the provided tag name.
+		 * <p>
+		 * Calls {@link Tags#hasTag(Block, ResourceLocation)} using {@link ItemStack#getItem()}, returning the result.
+		 * 
+		 * @param stack - The {@link ItemStack} to examine
+		 * @param tagName - The ID of the {@link ITag}
+		 * @return Whether the {@link ItemStack} has the identified {@link ITag}.
+		 */
+		public static boolean hasTag(@Nonnull ItemStack stack, ResourceLocation tagName) {
+			return Tags.hasTag(stack.getItem(), tagName);
+		}
+		
+		/**
+		 * Convenience method to determine whether the provided {@link Item} has the {@link ITag} corresponding to the provided tag name.
+		 * 
+		 * @param item - The {@link Item} to examine
+		 * @param tagName - The ID of the {@link ITag}
+		 * @return Whether the {@link Item} has the identified {@link ITag}.
+		 */
+		public static boolean hasTag(@Nonnull Item item, ResourceLocation tagName) {
+			return item.getTags().contains(tagName);
+		}
+		
+		/**
+		 * Convenience method to safely check whether the provided {@link ItemStack} has a container {@link Item}, and if so, whether that container has the provided tag name.
+		 * <p>
+		 * Checks if {@link ItemStack#hasContainerItem()}, and if so, returns {@link Tags#hasTag(ItemStack, ResourceLocation)} using the result.
+		 * 
+		 * @param stack - The {@link ItemStack} to examine
+		 * @param tagName - The ID of the {@link ITag}
+		 * @return Whether the provided {@link ItemStack} has a container item that has the identified {@link ITag}.
+		 */
+		public static boolean containerHasTag(@Nonnull ItemStack stack, ResourceLocation tagName) {
+			return stack.hasContainerItem() ? Tags.hasTag(stack.getContainerItem(), tagName) : false;
+		}
 
 		/**
 		 * Creates a {@link String} suitable for use as an {@link INamedTag} name.
