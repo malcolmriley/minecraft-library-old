@@ -200,7 +200,7 @@ public final class Utilities {
 		 * @param namedStack - The {@link ItemStack} whose display name should be used to rename the {@link TileEntity}
 		 */
 		public static void tryRenameFrom(@Nullable TileEntity discovered, @Nonnull ItemStack namedStack) {
-			if (discovered instanceof LockableTileEntity) {
+			if (namedStack.hasDisplayName() && discovered instanceof LockableTileEntity) {
 				((LockableTileEntity)discovered).setCustomName(namedStack.getDisplayName());
 			}
 		}
