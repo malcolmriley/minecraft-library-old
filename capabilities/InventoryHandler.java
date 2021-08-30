@@ -3,6 +3,8 @@ package paragon.minecraft.library.capabilities;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
@@ -56,6 +58,29 @@ public class InventoryHandler extends ItemStackHandler {
 						Utilities.Game.spawnItemNear(world, handler.getStackInSlot(index), position, ThreadLocalRandom.current(), 0.12D);
 					}
 				});
+			}
+		}
+	}
+	
+	/**
+	 * Returns a {@link Stream} over all {@link ItemStack} contained by this {@link InventoryHandler}.
+	 * 
+	 * @return All {@link ItemStack} contained by this {@link InventoryHandler}.
+	 */
+	public Stream<ItemStack> streamItems() {
+		return this.stacks.stream();
+	}
+	
+	/**
+	 * Performs the provided operation on each non-empty stack contained by this {@link InventoryHandler}.
+	 * 
+	 * @param stackOperation - The operation to perform
+	 */
+	public void forNonEmpty(Consumer<ItemStack> stackOperation) {
+		for(int index = 0; index < this.stacks.size() ; index += 1) {
+			ItemStack iterated = this.getStackInSlot(index);
+			if (!iterated.isEmpty()) {
+				stackOperation.accept(iterated);
 			}
 		}
 	}
