@@ -49,6 +49,7 @@ import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -214,6 +215,22 @@ public final class Utilities {
 		 */
 		public static boolean isBlockLoaded(IWorld world, BlockPos position) {
 			return world.chunkExists(position.getX() >> 4, position.getZ() >> 4);
+		}
+		
+		/**
+		 * Performs rudimentary check of the provided {@link ItemStack} to see if it has inventory data attached.
+		 * <p>
+		 * Checks the {@link ItemStack} tag for a tag list named {@literal "Items"}, as this is the mechanism the base
+		 * game uses to attach inventories to {@link ItemStack}, such as for Shulker Boxes.
+		 * 
+		 * @param stack - The {@link ItemStack} to examine.
+		 * @return Whether inventory data is attached to the provided {@link ItemStack}.
+		 */
+		public static boolean itemHasInventory(@Nullable ItemStack stack) {
+			if (Objects.nonNull(stack)) {
+				return stack.hasTag() ? stack.getTag().contains("Items", Constants.NBT.TAG_LIST) : false;
+			}
+			return false;
 		}
 
 		/**
