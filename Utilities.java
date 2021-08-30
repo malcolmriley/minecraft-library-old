@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -32,8 +33,10 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ITag.INamedTag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tileentity.LockableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -187,6 +190,20 @@ public final class Utilities {
 	public static class Game {
 
 		private Game() {}
+		
+		/**
+		 * Tries to rename the provided {@link TileEntity} using the display name of the provided {@link Stack}.
+		 * <p>
+		 * Merely checks to see if the provided {@link TileEntity} is {@link LockableTileEntity}, and uses the inbuilt mechanism for renaming.
+		 * 
+		 * @param discovered - The {@link TileEntity} to rename (may be null)
+		 * @param namedStack - The {@link ItemStack} whose display name should be used to rename the {@link TileEntity}
+		 */
+		public static void tryRenameFrom(@Nullable TileEntity discovered, @Nonnull ItemStack namedStack) {
+			if (discovered instanceof LockableTileEntity) {
+				((LockableTileEntity)discovered).setCustomName(namedStack.getDisplayName());
+			}
+		}
 
 		/**
 		 * Returns whether the chunk at the indicated {@link BlockPos} is currently loaded.
