@@ -31,6 +31,7 @@ public class InventoryHandler extends ItemStackHandler {
 	protected final TileEntity HOLDER;
 
 	/* Constants */
+	private static final String TAG_NAME_LEGACY = "Items";
 	private static final String TAG_NAME = "ItemInventory";
 
 	public InventoryHandler(int inventorySize, TileEntity holder) {
@@ -160,7 +161,10 @@ public class InventoryHandler extends ItemStackHandler {
 	 * @param compound - The compound to read from
 	 */
 	public void readFrom(@Nonnull CompoundNBT compound) {
-		if (compound.contains(TAG_NAME, Constants.NBT.TAG_COMPOUND)) {
+		if (compound.contains(TAG_NAME_LEGACY, Constants.NBT.TAG_LIST)) {
+			this.deserializeNBT(compound);
+		}
+		else if (compound.contains(TAG_NAME, Constants.NBT.TAG_COMPOUND)) {
 			this.deserializeNBT(compound.getCompound(TAG_NAME));
 		}
 	}
