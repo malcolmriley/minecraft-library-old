@@ -227,8 +227,15 @@ public final class Utilities {
 		 * @return Whether inventory data is attached to the provided {@link ItemStack}.
 		 */
 		public static boolean itemHasInventory(@Nullable ItemStack stack) {
-			if (Objects.nonNull(stack)) {
-				return stack.hasTag() ? stack.getTag().contains("Items", Constants.NBT.TAG_LIST) : false;
+			final String entityDataTag = "BlockEntityTag";
+			final String legacyInventoryTag = "Items";
+			if (Objects.nonNull(stack) && stack.hasTag()) {
+				if (stack.getTag().contains(legacyInventoryTag, Constants.NBT.TAG_LIST)) {
+					return true;
+				}
+				else if (stack.getTag().contains(entityDataTag, Constants.NBT.TAG_COMPOUND)) {
+					return stack.getChildTag(entityDataTag).contains(legacyInventoryTag, Constants.NBT.TAG_LIST);
+				}
 			}
 			return false;
 		}
