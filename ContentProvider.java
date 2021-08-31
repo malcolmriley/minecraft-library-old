@@ -55,13 +55,17 @@ public abstract class ContentProvider<T extends IForgeRegistryEntry<T>> implemen
 	 * @return An {@link Stream} over all non-null content instances.
 	 */
 	public Stream<T> streamContent() {
-		return this.ALL.getEntries().stream().filter(entry -> entry.isPresent()).map(entry -> entry.get());
+		return this.filterUnregistered(this.ALL.getEntries().stream());
 	}
 
 	/* Internal Methods */
 
 	protected RegistryObject<T> add(String name, Supplier<T> supplier) {
 		return this.ALL.register(name, supplier);
+	}
+
+	protected Stream<T> filterUnregistered(Stream<RegistryObject<T>> input) {
+		return input.filter(RegistryObject::isPresent).map(RegistryObject::get);
 	}
 
 }
