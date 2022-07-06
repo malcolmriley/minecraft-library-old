@@ -4,8 +4,9 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
  * Simple {@link InventoryHandler} derivative with means for checking whether a provided {@link ItemStack} can be inserted into a particular {@link Slot}.
@@ -17,7 +18,7 @@ public class FilteredInventoryHandler extends InventoryHandler {
 	/* Internal Fields */
 	protected final IInventorySlotPredicate FILTER;
 
-	public FilteredInventoryHandler(int inventorySize, TileEntity holder, @Nonnull IInventorySlotPredicate filter) {
+	public FilteredInventoryHandler(int inventorySize, BlockEntity holder, @Nonnull IInventorySlotPredicate filter) {
 		super(inventorySize, holder);
 		this.FILTER = Objects.requireNonNull(filter);
 	}

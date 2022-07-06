@@ -7,10 +7,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Class for managing a number of {@link Slot} as a conceptually-cohesive group.
@@ -50,7 +49,7 @@ public class SlotGroup {
 	 * @return Whether any {@link Slot} managed by this {@link SlotGroup} contain any {@link ItemStack}.
 	 */
 	public boolean hasAnyItemStacks() {
-		return this.streamSlots().anyMatch(slot -> slot.getHasStack());
+		return this.streamSlots().anyMatch(slot -> slot.hasItem());
 	}
 
 	/**
@@ -164,7 +163,7 @@ public class SlotGroup {
 	 * @return The {@link ItemStack} contained by the {@link Slot} at the provided index.
 	 */
 	public ItemStack getStack(int index) {
-		return this.SLOTS.get(index).getStack();
+		return this.SLOTS.get(index).getItem();
 	}
 
 	/**
@@ -220,7 +219,7 @@ public class SlotGroup {
 	 * @param action - The action to perform
 	 */
 	public void forEachStack(Consumer<ItemStack> action) {
-		this.SLOTS.values().stream().filter(slot -> slot.getHasStack()).forEach(slot -> action.accept(slot.getStack()));
+		this.SLOTS.values().stream().filter(slot -> slot.hasItem()).forEach(slot -> action.accept(slot.getItem()));
 	}
 
 	/* Builder Implementation */
@@ -286,22 +285,22 @@ public class SlotGroup {
 		 * This will add the provided {@link Slot} to the {@link SlotGroup} that will ultimately be constructed by this {@link SlotGroup.Builder}.
 		 * <p>
 		 * Callers should ensure that the {@link Slot} has been added to a container before calling this method, as that is how the {@link Slot} obtains
-		 * its index within the {@link IInventory} it manages.
+		 * its index within the inventory it manages.
 		 *
 		 * @param slot - The {@link Slot} to add
 		 * @return {@code this}, for method chaining.
 		 */
 		public Builder add(Slot slot) {
-			final int newIndex = slot.slotNumber;
+			final int newIndex = slot.index;
 			if (this.SLOTS.containsKey(newIndex)) {
 				throw new IllegalArgumentException(EXCEPTION_DUPLICATE_NUMBER);
 			}
-			this.SLOTS.put(slot.slotNumber, Objects.requireNonNull(slot, EXCEPTION_NULL_SLOT));
+			this.SLOTS.put(slot.index, Objects.requireNonNull(slot, EXCEPTION_NULL_SLOT));
 			// Re-evaluate min and max positions
-			this.minX = Math.min(this.minX, slot.xPos);
-			this.minY = Math.min(this.minY, slot.yPos);
-			this.maxX = Math.max(this.maxX, slot.xPos);
-			this.maxY = Math.max(this.maxY, slot.yPos);
+			this.minX = Math.min(this.minX, slot.x);
+			this.minY = Math.min(this.minY, slot.y);
+			this.maxX = Math.max(this.maxX, slot.x);
+			this.maxY = Math.max(this.maxY, slot.y);
 			// Re-evaluate min and max index
 			this.minIndex = Math.min(this.minIndex, newIndex);
 			this.maxIndex = Math.max(this.maxIndex, newIndex);
@@ -312,7 +311,7 @@ public class SlotGroup {
 		 * This will add all provided {@link Slot} to the {@link SlotGroup} that will ultimately be constructed by this {@link SlotGroup.Builder}.
 		 * <p>
 		 * Callers should ensure that the provided {@link Slot}s have been added to a container before calling this method, as that is how {@link Slot} obtains
-		 * their index within the {@link IInventory} it manages.
+		 * their index within the inventory it manages.
 		 *
 		 * @param slots - The {@link Slot}s to add
 		 * @return {@code this}, for method chaining.

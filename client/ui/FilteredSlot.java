@@ -3,9 +3,9 @@ package paragon.minecraft.library.client.ui;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Specialized {@link Slot} implementation that accepts a {@link Predicate} as a filter for {@link ItemStack}.
@@ -17,8 +17,8 @@ public class FilteredSlot extends Slot {
 	/* Internal Fields */
 	protected final Predicate<ItemStack> CHECK;
 
-	public FilteredSlot(IInventory inventoryIn, int index, int xPosition, int yPosition, Predicate<ItemStack> stackPredicate) {
-		super(inventoryIn, index, xPosition, yPosition);
+	public FilteredSlot(Container inventory, int index, int xPosition, int yPosition, Predicate<ItemStack> stackPredicate) {
+		super(inventory, index, xPosition, yPosition);
 		this.CHECK = Objects.requireNonNull(stackPredicate);
 	}
 	
@@ -36,8 +36,8 @@ public class FilteredSlot extends Slot {
 	 * @return - Whether insertion succeeded.
 	 */
 	public boolean tryPutStack(ItemStack stack) {
-		if (this.isItemValid(stack)) {
-			this.putStack(stack);
+		if (this.mayPlace(stack)) {
+			this.set(stack);
 			return true;
 		}
 		return false;
@@ -46,7 +46,7 @@ public class FilteredSlot extends Slot {
 	/* Supertype Override Methods */
 
 	@Override
-	public boolean isItemValid(ItemStack stack) {
+	public boolean mayPlace(ItemStack stack) {
 		return this.CHECK.test(stack);
 	}
 

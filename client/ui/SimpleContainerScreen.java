@@ -1,16 +1,18 @@
 package paragon.minecraft.library.client.ui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import paragon.minecraft.library.Utilities;
-import paragon.minecraft.library.client.ClientUtilities;
+import paragon.minecraft.wilytextiles.internal.ClientUtilities;
+import paragon.minecraft.wilytextiles.internal.Utilities;
 
 /**
  * Simple {@link ContainerScreen} implementation suitable for screens that merely draw a background texture and appropriate titles.
@@ -23,23 +25,23 @@ import paragon.minecraft.library.client.ClientUtilities;
  * @param <C> The {@link Container} type
  */
 @OnlyIn(Dist.CLIENT)
-public abstract class SimpleContainerScreen<C extends Container> extends ContainerScreen<C> {
+public abstract class SimpleContainerScreen<C extends AbstractContainerMenu> extends AbstractContainerScreen<C> {
 	
-	public SimpleContainerScreen(C screenContainer, PlayerInventory inventory, ITextComponent title) {
+	public SimpleContainerScreen(C screenContainer, Inventory inventory, Component title) {
 		super(screenContainer, inventory, title);
 	}
 
 	/* Supertype Override Methods */
 
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
 		this.renderBackground(matrixStack);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+	public void renderBackground(PoseStack matrixStack) {
 		ClientUtilities.Render.drawCenteredBackgroundLayer(this, matrixStack, this.getBackgroundTexture(), this.getXSize(), this.getYSize());
 	}
 	

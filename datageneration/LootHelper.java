@@ -12,18 +12,17 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.LootTableProvider;
-import net.minecraft.data.loot.BlockLootTables;
-import net.minecraft.loot.LootParameterSet;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.LootTable.Builder;
-import net.minecraft.loot.LootTableManager;
-import net.minecraft.loot.ValidationTracker;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTable.Builder;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraftforge.registries.RegistryObject;
 
 /**
  * Data-generator class for assisting with generating JSON {@link LootTable}.
@@ -39,15 +38,15 @@ public abstract class LootHelper extends LootTableProvider {
 	/* Supertype Override Methods */
 
 	@Override
-	public final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootParameterSet>> getTables() {
-		List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootParameterSet>> list = new ArrayList<>();
+	public final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
+		List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> list = new ArrayList<>();
 		this.addLootTables(list::add);
 		return Collections.unmodifiableList(list);
 	}
 
 	@Override
-	protected final void validate(Map<ResourceLocation, LootTable> map, ValidationTracker validationtracker) {
-		map.forEach((key, value) -> LootTableManager.validateLootTable(validationtracker, key, value));
+	protected final void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker) {
+		map.forEach((key, value) -> LootTables.validate(validationtracker, key, value));
 	}
 
 	/* Abstract Methods */
@@ -55,18 +54,18 @@ public abstract class LootHelper extends LootTableProvider {
 	/**
 	 * Implementors should use this method to add loot tables.
 	 * <p>
-	 * The general idea is to invoke the provided {@link Consumer} using {@link Pair#of(Object, Object)} using {@link LootParameterSets} and a supplier to the individual table-providing method or class.
+	 * The general idea is to invoke the provided {@link Consumer} using {@link Pair#of(Object, Object)} using {@link LootContextParamSet} and a supplier to the individual table-providing method or class.
 	 * <p>
 	 * A suggested implementation for {@link Block} loot tables is to extend {@link BlockLootTables} and then use {@code ExtendingClass::new} to create a {@link Supplier} from it, providing it to this method.
 	 *
 	 * @param registrar
 	 */
-	protected abstract void addLootTables(Consumer<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, Builder>>>, LootParameterSet>> registrar);
+	protected abstract void addLootTables(Consumer<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> registrar);
 
 	/**
 	 * Data generation helper for {@link Block} loot tables
 	 */
-	public static abstract class BlockLoot extends BlockLootTables {
+	public static abstract class BlockLootTables extends BlockLoot {
 		
 		/* Abstract Methods */
 
@@ -93,7 +92,7 @@ public abstract class LootHelper extends LootTableProvider {
 		 */
 		protected void addLootFor(RegistryObject<Block> registryObject, LootTable.Builder builder) {
 			if (registryObject.isPresent()) {
-				this.registerLootTable(registryObject.get(), builder);
+				this.add(registryObject.get(), builder);
 			}
 		}
 
@@ -106,7 +105,7 @@ public abstract class LootHelper extends LootTableProvider {
 		 */
 		protected void addLootFor(RegistryObject<Block> registryObject, Function<Block, LootTable.Builder> builderFunction) {
 			if (registryObject.isPresent()) {
-				this.registerLootTable(registryObject.get(), builderFunction);
+				this.add(registryObject.get(), builderFunction);
 			}
 		}
 		
@@ -117,7 +116,7 @@ public abstract class LootHelper extends LootTableProvider {
 		 */
 		@SafeVarargs // Mere iterate and fetch. Should not used in runtime code anyways.
 		protected final void dropSelf(RegistryObject<Block> ... registryObjects) {
-			Stream.of(registryObjects).filter(RegistryObject::isPresent).forEach(element -> this.registerDropSelfLootTable(element.get()));
+			Stream.of(registryObjects).filter(RegistryObject::isPresent).forEach(element -> this.dropSelf(element.get()));
 		}
 		
 	}

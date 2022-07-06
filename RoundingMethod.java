@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Enum class specifying/implementing a number of common rounding methods.
@@ -13,8 +13,8 @@ import net.minecraft.util.math.MathHelper;
  */
 public enum RoundingMethod implements IRoundingMethod {
 	
-	FLOOR(MathHelper::floor),
-	CEILING(MathHelper::ceil),
+	FLOOR(Mth::floor),
+	CEILING(Mth::ceil),
 	ROUND_UP(value -> Math.round((float)value)),
 	ROUND_DOWN(value -> value > 0.5 ? 1 : 0);
 	;

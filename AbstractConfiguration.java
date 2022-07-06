@@ -11,6 +11,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
+import paragon.minecraft.wilytextiles.internal.IEventBusListener;
 
 /**
  * Class that provides a means of automatically refreshing values held by {@link ConfigValue} derivatives.
@@ -33,12 +35,12 @@ public abstract class AbstractConfiguration implements IEventBusListener {
 	/* Event Subscriber Methods */
 	
 	@SubscribeEvent
-	public void onLoad(final ModConfig.Loading event) {
+	public void onLoad(final ModConfigEvent.Loading event) {
 		this.refreshAll();
 	}
 	
 	@SubscribeEvent
-	public void onReload(final ModConfig.Reloading event) {
+	public void onReload(final ModConfigEvent.Reloading event) {
 		this.refreshAll();
 	}
 	

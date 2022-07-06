@@ -1,7 +1,8 @@
 package paragon.minecraft.library.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 
 /**
  * Simple fuel item.
@@ -19,7 +20,7 @@ public class ItemSimpleFuel extends Item {
 	}
 
 	@Override
-	public int getBurnTime(ItemStack passedStack) {
+	public int getBurnTime(ItemStack passedStack, RecipeType<?> type) {
 		return this.BURN_TIME;
 	}
 

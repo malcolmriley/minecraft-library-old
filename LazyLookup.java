@@ -7,10 +7,10 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Objects;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.RegistryObject;
 
 /**
  * Specialized {@link LazyTransformer} intended to be used on {@link IForgeRegistryEntry} derivatives.

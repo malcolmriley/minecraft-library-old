@@ -14,9 +14,10 @@ import javax.annotation.Nonnull;
 
 import com.google.common.base.Predicates;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import paragon.minecraft.wilytextiles.internal.Utilities;
 
 /**
  * Class for the exploration/evaluation of {@link BlockPos}.
@@ -41,7 +42,7 @@ public abstract class BlockExplorer {
 	 * @param stateEvaluator - A {@link BlockState} evaluator
 	 * @return A suitable {@link MatchingBlockExplorer}.
 	 */
-	public static final MatchingBlockExplorer contiguousMatching(IWorld world, Predicate<BlockState> stateEvaluator) {
+	public static final MatchingBlockExplorer contiguousMatching(Level world, Predicate<BlockState> stateEvaluator) {
 		MatchingBlockExplorer instance = new MatchingBlockExplorer();
 		instance.setExploreFunction(Utilities.Game::orthogonalNeighborsOf);
 		instance.setEvaluator(position -> Utilities.Game.isBlockLoaded(world, position) && stateEvaluator.test(world.getBlockState(position)));

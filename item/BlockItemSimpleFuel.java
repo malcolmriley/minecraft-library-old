@@ -1,8 +1,9 @@
 package paragon.minecraft.library.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Simple fuel {@link BlockItem}.
@@ -20,7 +21,7 @@ public class BlockItemSimpleFuel extends BlockItem {
 	}
 
 	@Override
-	public int getBurnTime(ItemStack stack) {
+	public int getBurnTime(ItemStack stack, RecipeType<?> recipeType) {
 		return this.BURN_TIME;
 	}
 

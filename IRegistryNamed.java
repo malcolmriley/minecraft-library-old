@@ -1,6 +1,6 @@
 package paragon.minecraft.library;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Base interface type for objects that can be identified by a {@link ResourceLocation}.

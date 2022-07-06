@@ -1,13 +1,13 @@
 package paragon.minecraft.library.datageneration;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelFile.UncheckedModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import paragon.minecraft.library.Utilities;
+import paragon.minecraft.wilytextiles.internal.Utilities;
 
 
 /**

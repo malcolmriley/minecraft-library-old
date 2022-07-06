@@ -2,8 +2,8 @@ package paragon.minecraft.library.item;
 
 import java.util.function.Supplier;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Extension of the simple {@link BlockItem} that takes a {@link Supplier} instead of a direct block reference.

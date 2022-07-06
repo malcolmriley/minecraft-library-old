@@ -23,15 +23,17 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.JsonOps;
 
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
+import paragon.minecraft.wilytextiles.internal.ContentProvider;
+import paragon.minecraft.wilytextiles.internal.IEventBusListener;
 
 /**
  * A special registration class that holds an {@link IForgeRegistry}, but also examines datapacks for local overrides.
@@ -50,15 +52,17 @@ public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IE
 	/* Internal Fields */
 	protected final Class<T> TYPE;
 	protected final String MODID;
-	protected final String NAME;
+	protected final String DIRECTORY;
+	protected final ResourceLocation NAME;
 
 	protected Supplier<IForgeRegistry<T>> registry = null;
 	protected Optional<Map<ResourceLocation, T>> overrides = Optional.empty();
 
-	public DataDrivenRegistrar(Class<T> registryType, String modid, String name) {
+	public DataDrivenRegistrar(Class<T> registryType, String modid, String name, String directory) {
 		this.TYPE = Objects.requireNonNull(registryType);
 		this.MODID = Objects.requireNonNull(modid);
-		this.NAME = Objects.requireNonNull(name);
+		this.DIRECTORY = Objects.requireNonNull(directory);
+		this.NAME = new ResourceLocation(this.MODID, name);
 	}
 
 	/* Public Methods */
@@ -140,15 +144,15 @@ public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IE
 	 * @return A new {@link JsonRegistryReloader} instance.
 	 */
 	public final JsonRegistryReloader<T> createReloadListener(Decoder<T> decoder, Logger logger) {
-		return new JsonRegistryReloader<>(GSON, this.NAME, decoder, this, logger);
+		return new JsonRegistryReloader<T>(GSON, this.DIRECTORY, decoder, this, logger);
 	}
 
 	/* IEventBusListener Compliance Method */
 
 	@Override
 	public final void registerTo(IEventBus bus) {
-		DeferredRegister<T> registrar = DeferredRegister.create(this.TYPE, this.MODID);
-		this.registry = registrar.makeRegistry(this.NAME, () -> this.createRegistry());
+		DeferredRegister<T> registrar = DeferredRegister.create(this.NAME, this.MODID);
+		this.registry = registrar.makeRegistry(this.TYPE, () -> this.createRegistry());
 		this.registerContent(registrar);
 		registrar.register(bus);
 	}
@@ -194,14 +198,14 @@ public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IE
 	/* JsonReloadListener Extension Implementation */
 
 	/**
-	 * A specialized {@link JsonReloadListener} intended to be used with {@link DataDrivenRegistrar}.
+	 * A specialized {@link SimpleJsonResourceReloadListener} intended to be used with {@link DataDrivenRegistrar}.
 	 * To obtain an instance, use {@link DataDrivenRegistrar#createReloadListener(Decoder, Logger)}.
 	 *
 	 * @author Malcolm Riley
 	 * @param <T> The {@link IForgeRegistryEntry} type to be deserialized from JSON.
 	 * @see DataDrivenRegistrar#createReloadListener(Decoder, Logger)
 	 */
-	protected static final class JsonRegistryReloader<T extends IForgeRegistryEntry<T>> extends JsonReloadListener {
+	protected static final class JsonRegistryReloader<T extends IForgeRegistryEntry<T>> extends SimpleJsonResourceReloadListener {
 
 		/* Internal Fields */
 		protected final Decoder<T> DECODER;
@@ -218,7 +222,7 @@ public class DataDrivenRegistrar<T extends IForgeRegistryEntry<T>> implements IE
 		/* Supertype Override Methods */
 
 		@Override
-		protected void apply(Map<ResourceLocation, JsonElement> elements, IResourceManager manager, IProfiler profiler) {
+		public void apply(Map<ResourceLocation, JsonElement> elements, ResourceManager manager, ProfilerFiller profiler) {
 			this.REGISTRAR.clearOverrides();
 			elements.forEach(this::parseToRegistrar);
 		}

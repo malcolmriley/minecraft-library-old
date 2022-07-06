@@ -8,17 +8,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import paragon.minecraft.library.Utilities;
+import paragon.minecraft.wilytextiles.internal.Utilities;
 
 /**
  * Specialized {@link ItemStackHandler} that publicly exposes its internal {@link NonNullList} of {@link ItemStack}.
@@ -28,13 +28,13 @@ import paragon.minecraft.library.Utilities;
 public class InventoryHandler extends ItemStackHandler {
 
 	/* Internal Fields */
-	protected final TileEntity HOLDER;
+	protected final BlockEntity HOLDER;
 
 	/* Constants */
 	private static final String TAG_NAME_LEGACY = "Items";
 	private static final String TAG_NAME = "ItemInventory";
 
-	public InventoryHandler(int inventorySize, TileEntity holder) {
+	public InventoryHandler(int inventorySize, BlockEntity holder) {
 		super(inventorySize);
 		this.HOLDER = holder;
 	}
@@ -46,13 +46,13 @@ public class InventoryHandler extends ItemStackHandler {
 	 * host {@link TileEntity} has changed to a non-matching state.
 	 * 
 	 * @param originalState - The original {@link BlockState}
-	 * @param world - A reference to the {@link World} containing the {@link BlockState}
+	 * @param world - A reference to the {@link LevelAccessor} containing the {@link BlockState}
 	 * @param position - The {@link BlockPos} of the changed {@link BlockState}
 	 * @param newState - The new {@link BlockState}.
 	 */
-	public static void dropContents(BlockState originalState, World world, BlockPos position, BlockState newState) {
-		if (originalState.hasTileEntity() && !newState.isIn(originalState.getBlock())) {
-			TileEntity discovered = world.getTileEntity(position);
+	public static void dropContents(BlockState originalState, LevelAccessor world, BlockPos position, BlockState newState) {
+		if (originalState.hasBlockEntity() && !newState.is(originalState.getBlock())) {
+			BlockEntity discovered = world.getBlockEntity(position);
 			if (Objects.nonNull(discovered)) {
 				discovered.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
 					for (int index = 0; index < handler.getSlots(); index += 1) {
@@ -149,7 +149,7 @@ public class InventoryHandler extends ItemStackHandler {
 	 *
 	 * @param compound - The compound to write to
 	 */
-	public void writeTo(@Nonnull CompoundNBT compound) {
+	public void writeTo(@Nonnull CompoundTag compound) {
 		compound.put(TAG_NAME, this.serializeNBT());
 	}
 
@@ -160,11 +160,11 @@ public class InventoryHandler extends ItemStackHandler {
 	 *
 	 * @param compound - The compound to read from
 	 */
-	public void readFrom(@Nonnull CompoundNBT compound) {
-		if (compound.contains(TAG_NAME_LEGACY, Constants.NBT.TAG_LIST)) {
+	public void readFrom(@Nonnull CompoundTag compound) {
+		if (compound.contains(TAG_NAME_LEGACY, Tag.TAG_LIST)) {
 			this.deserializeNBT(compound);
 		}
-		else if (compound.contains(TAG_NAME, Constants.NBT.TAG_COMPOUND)) {
+		else if (compound.contains(TAG_NAME, Tag.TAG_COMPOUND)) {
 			this.deserializeNBT(compound.getCompound(TAG_NAME));
 		}
 	}
@@ -174,7 +174,7 @@ public class InventoryHandler extends ItemStackHandler {
 	@Override
 	protected void onContentsChanged(int slot) {
 		super.onContentsChanged(slot);
-		this.HOLDER.markDirty();
+		this.HOLDER.setChanged();
 	}
 
 }

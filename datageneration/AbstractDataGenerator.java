@@ -15,9 +15,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.resources.ResourceLocation;
 import paragon.minecraft.library.IRegistryNamed;
 
 /**
@@ -28,7 +28,7 @@ import paragon.minecraft.library.IRegistryNamed;
  *
  * @param <T> The {@link IRegistryNamed} type.
  */
-public abstract class AbstractDataGenerator<T extends IRegistryNamed> implements IDataProvider {
+public abstract class AbstractDataGenerator<T extends IRegistryNamed> implements DataProvider {
 	
 	/* Internal Fields */
 	private final DataGenerator GENERATOR;
@@ -48,7 +48,7 @@ public abstract class AbstractDataGenerator<T extends IRegistryNamed> implements
 	/* IDataProvider Compliance Methods */
 
 	@Override
-	public final void act(DirectoryCache cache) throws IOException {
+	public final void run(HashCache cache) throws IOException {
 		Set<ResourceLocation> knownLocations = new HashSet<>();
 		this.generate(instance -> this.createAndAdd(knownLocations, this::toJson, instance, cache));
 	}
@@ -77,12 +77,12 @@ public abstract class AbstractDataGenerator<T extends IRegistryNamed> implements
 		return this.GENERATOR.getOutputFolder().resolve(Paths.get(ROOT_DIRECTORY, instance.getRegistryName().getNamespace(), this.DIRECTORY_NAME, instance.getRegistryName().getPath() + OUTPUT_SUFFIX));
 	}
 	
-	private final void createAndAdd(final Set<ResourceLocation> locations, Function<T, JsonElement> serializer, final T instance, DirectoryCache cache) {
+	private final void createAndAdd(final Set<ResourceLocation> locations, Function<T, JsonElement> serializer, final T instance, HashCache cache) {
 		if (!locations.add(instance.getRegistryName())) {
 			throw new IllegalStateException("Duplicate instance registered to ID: " + instance.getRegistryName());
 		}
 		try {
-			IDataProvider.save(this.GSON, cache, serializer.apply(instance), this.resolveOutputPath(instance));
+			DataProvider.save(this.GSON, cache, serializer.apply(instance), this.resolveOutputPath(instance));
 		}
 		catch (IOException exception) {
 			Logger logger = LogManager.getLogger();

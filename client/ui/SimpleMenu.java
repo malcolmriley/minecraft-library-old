@@ -2,21 +2,21 @@ package paragon.minecraft.library.client.ui;
 
 import java.util.Objects;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.RegistryObject;
 
 /**
- * Extended {@link Container} implementation with some convenience methods.
+ * Extended {@link AbstractContainerMenu} implementation with some convenience methods.
  *
  * @author Malcolm Riley
  */
-public abstract class AbstractContainer extends Container {
+public abstract class SimpleMenu extends AbstractContainerMenu {
 
 	/* Constants */
 
@@ -55,11 +55,11 @@ public abstract class AbstractContainer extends Container {
 	 */
 	protected static final int PLAYER_INVENTORY_HEIGHT = 3;
 
-	protected AbstractContainer(ContainerType<?> type, int id) {
+	protected SimpleMenu(MenuType<?> type, int id) {
 		super(type, id);
 	}
 
-	protected AbstractContainer(RegistryObject<ContainerType<?>> type, int id) {
+	protected SimpleMenu(RegistryObject<MenuType<?>> type, int id) {
 		this(type.get(), id);
 	}
 
@@ -68,37 +68,37 @@ public abstract class AbstractContainer extends Container {
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * {@link AbstractContainer#transferStackInSlot(PlayerEntity, int)} is a basic implementation of shift-click response that takes care of some boilerplate, namely the case when an empty {@link Slot} is called for transfer.
+	 * {@link SimpleMenu#quickMoveStack(Player, int)} is a basic implementation of shift-click response that takes care of some boilerplate, namely the case when an empty {@link Slot} is called for transfer.
 	 * If the provided index leads to a null or empty source {@link Slot}, then {@link ItemStack#EMPTY} is returned.
 	 * <p>
-	 * If not, it is assumed that the {@link ItemStack} in the source {@link Slot} is a valid shift-click transfer source, and the method delegates to {@link #onStackTransfer(PlayerEntity, int, ItemStack)}.
+	 * If not, it is assumed that the {@link ItemStack} in the source {@link Slot} is a valid shift-click transfer source, and the method delegates to {@link #onStackTransfer(Player, int, ItemStack)}.
 	 * <p>
-	 * Implementors should prefer overriding {@link #onStackTransfer(PlayerEntity, int, ItemStack)} to this method.
+	 * Implementors should prefer overriding {@link #onStackTransfer(Player, int, ItemStack)} to this method.
 	 */
 	@Override
-	public ItemStack transferStackInSlot(PlayerEntity player, int sourceSlotIndex) {
+	public ItemStack quickMoveStack(Player player, int sourceSlotIndex) {
 		final Slot sourceSlot = this.getSlot(sourceSlotIndex);
-		if (Objects.isNull(sourceSlot) || !sourceSlot.getHasStack()) {
+		if (Objects.isNull(sourceSlot) || !sourceSlot.hasItem()) {
 			return ItemStack.EMPTY;
 		}
-		return this.onStackTransfer(player, sourceSlotIndex, sourceSlot.getStack());
+		return this.onStackTransfer(player, sourceSlotIndex, sourceSlot.getItem());
 	}
 
 	/* Subtype Helper Methods */
 
 	/**
-	 * This method handles the behavior wherein a player has requested a shift-click transfer of the provided non-null, non-empty {@link ItemStack} within the currently open {@link AbstractContainer}.
+	 * This method handles the behavior wherein a player has requested a shift-click transfer of the provided non-null, non-empty {@link ItemStack} within the currently open {@link SimpleMenu}.
 	 * <p>
 	 * The method should return {@link ItemStack#EMPTY} if exactly zero of the input stack could be transfered, and a copy of the source stack in all other circumstances.
 	 * <p>
 	 * The base implementation of this method merely returns {@link ItemStack#EMPTY}, implying that the transfer failed completely (zero items from the incoming stack were transfered).
 	 *
-	 * @param player - The {@link PlayerEntity} performing the action
+	 * @param player - The {@link Player} performing the action
 	 * @param sourceIndex - The index of the {@link Slot} from which the action was performed
 	 * @param sourceStack - The non-null, non-empty {@link ItemStack} being shift-clicked.
 	 * @return {@link ItemStack#EMPTY} if the transfer completely failed, or {@link ItemStack#copy()} of the source stack.
 	 */
-	protected ItemStack onStackTransfer(PlayerEntity player, int sourceIndex, ItemStack sourceStack) {
+	protected ItemStack onStackTransfer(Player player, int sourceIndex, ItemStack sourceStack) {
 		return ItemStack.EMPTY;
 	}
 
@@ -163,7 +163,7 @@ public abstract class AbstractContainer extends Container {
 	 */
 	protected boolean tryTransferTo(ItemStack sourceStack, boolean reverseOrder, SlotGroup target) {
 		if (target.isContiguous()) {
-			if (this.mergeItemStack(sourceStack, target.getMinIndex(), target.getMaxIndex() + 1, reverseOrder)) {
+			if (this.moveItemStackTo(sourceStack, target.getMinIndex(), target.getMaxIndex() + 1, reverseOrder)) {
 				return true;
 			}
 		}
@@ -172,7 +172,7 @@ public abstract class AbstractContainer extends Container {
 			final int end = reverseOrder ? target.getMinIndex() : target.getMaxIndex();
 			final int increment = reverseOrder ? -1 : 1;
 			for (int index = begin; index <= end; index += increment) {
-				if (target.holdsSlot(index) && this.mergeItemStack(sourceStack, index, index + 1, false)) {
+				if (target.holdsSlot(index) && this.moveItemStackTo(sourceStack, index, index + 1, false)) {
 					return true;
 				}
 			}
@@ -181,77 +181,77 @@ public abstract class AbstractContainer extends Container {
 	}
 
 	/**
-	 * Creates and adds both the player main inventory and player hotbar grids to the {@link AbstractContainer}, returning the constituent {@link Slot} of both within a {@link SlotGroup}.
+	 * Creates and adds both the player main inventory and player hotbar grids to the {@link SimpleMenu}, returning the constituent {@link Slot} of both within a {@link SlotGroup}.
 	 *
 	 * @param inventory - The player inventory to create the grid from
 	 * @param xPosition - The starting top-left x-position of the grid
 	 * @param yPosition - The starting top-left y-position of the grid
 	 * @return The constituent {@link Slot} of such a grid, contained as a {@link SlotGroup}.
 	 */
-	protected SlotGroup addPlayerGrid(PlayerInventory inventory, int xPosition, int yPosition) {
+	protected SlotGroup addPlayerGrid(Inventory inventory, int xPosition, int yPosition) {
 		final SlotGroup.Builder groupBuilder = SlotGroup.Builder.create((PLAYER_INVENTORY_WIDTH * PLAYER_INVENTORY_HEIGHT) + (PLAYER_HOTBAR_WIDTH * PLAYER_HOTBAR_HEIGHT));
-		final int hotbarYOffset = AbstractContainer.calculateSlotPosition(0, PLAYER_INVENTORY_HEIGHT + 1, DEFAULT_SLOT_SEPARATION) + DEFAULT_OFFSET_SMALL;
+		final int hotbarYOffset = SimpleMenu.calculateSlotPosition(0, PLAYER_INVENTORY_HEIGHT + 1, DEFAULT_SLOT_SEPARATION) + DEFAULT_OFFSET_SMALL;
 		this.addPlayerHotbarTo(groupBuilder, inventory, xPosition, yPosition + hotbarYOffset);
 		this.addPlayerInventoryTo(groupBuilder, inventory, xPosition, yPosition);
 		return groupBuilder.build();
 	}
 
 	/**
-	 * Creates and adds the standard player main inventory grid to the {@link AbstractContainer}, returning the constituent {@link Slot} within a {@link SlotGroup}.
+	 * Creates and adds the standard player main inventory grid to the {@link SimpleMenu}, returning the constituent {@link Slot} within a {@link SlotGroup}.
 	 * <p>
-	 * This will be a {@value AbstractContainer#PLAYER_INVENTORY_WIDTH} by {@value AbstractContainer#PLAYER_INVENTORY_HEIGHT} grid of ordinary {@link Slot}.
+	 * This will be a {@value SimpleMenu#PLAYER_INVENTORY_WIDTH} by {@value SimpleMenu#PLAYER_INVENTORY_HEIGHT} grid of ordinary {@link Slot}.
 	 *
 	 * @param inventory - The player inventory to create the grid from
 	 * @param xPosition - The starting top-left x-position of the grid
 	 * @param yPosition - The starting top-left y-position of the grid
 	 * @return The constituent {@link Slot} of such a grid, contained as a {@link SlotGroup}.
 	 */
-	protected SlotGroup addPlayerInventory(PlayerInventory inventory, int xPosition, int yPosition) {
+	protected SlotGroup addPlayerInventory(Inventory inventory, int xPosition, int yPosition) {
 		SlotGroup.Builder groupBuilder = SlotGroup.Builder.create(PLAYER_INVENTORY_WIDTH * PLAYER_INVENTORY_HEIGHT);
 		this.addPlayerInventoryTo(groupBuilder, inventory, xPosition, yPosition);
 		return groupBuilder.build();
 	}
 
 	/**
-	 * Creates and adds the standard player hotbar inventory grid to the {@link AbstractContainer}, returning the constituent {@link Slot} within a {@link SlotGrid}.
+	 * Creates and adds the standard player hotbar inventory grid to the {@link SimpleMenu}, returning the constituent {@link Slot} within a {@link SlotGrid}.
 	 * <p>
-	 * This will be a {@value AbstractContainer#PLAYER_HOTBAR_WIDTH} by {@value AbstractContainer#PLAYER_HOTBAR_HEIGHT} grid of ordinary {@link Slot}.
+	 * This will be a {@value SimpleMenu#PLAYER_HOTBAR_WIDTH} by {@value SimpleMenu#PLAYER_HOTBAR_HEIGHT} grid of ordinary {@link Slot}.
 	 *
 	 * @param inventory - The player inventory to create the grid from
 	 * @param xPosition - The starting top-left x-position of the grid
 	 * @param yPosition - The starting top-left y-position of the grid
 	 * @return The constituent {@link Slot} of such a grid, contained as a {@link SlotGroup}.
 	 */
-	protected SlotGroup addPlayerHotbar(PlayerInventory inventory, int xPosition, int yPosition) {
+	protected SlotGroup addPlayerHotbar(Inventory inventory, int xPosition, int yPosition) {
 		SlotGroup.Builder groupBuilder = SlotGroup.Builder.create(PLAYER_HOTBAR_WIDTH * PLAYER_HOTBAR_HEIGHT);
 		this.addPlayerHotbarTo(groupBuilder, inventory, xPosition, yPosition);
 		return groupBuilder.build();
 	}
 
 	/**
-	 * Adds a grid of simple {@link Slot} instances to this {@link AbstractContainer}, based on the provided parameters, with a default x and y separation between {@link Slot} elements of {@value AbstractContainer#DEFAULT_SLOT_SEPARATION}.
+	 * Adds a grid of simple {@link Slot} instances to this {@link SimpleMenu}, based on the provided parameters, with a default x and y separation between {@link Slot} elements of {@value SimpleMenu#DEFAULT_SLOT_SEPARATION}.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
 	 * @param height - The height of the grid, in quantity of {@link Slot}
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height) {
 		return this.addSlotGrid(inventory, xPosition, yPosition, width, height, Slot::new);
 	}
 
 	/**
-	 * Adds a grid of simple {@link Slot} instances to this {@link AbstractContainer}, based on the provided parameters, with an equivalent x and y separation between {@link Slot} elements.
+	 * Adds a grid of simple {@link Slot} instances to this {@link SimpleMenu}, based on the provided parameters, with an equivalent x and y separation between {@link Slot} elements.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
@@ -259,17 +259,17 @@ public abstract class AbstractContainer extends Container {
 	 * @param separation - The horizontal separation between individual {@link Slot} within the grid
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height, int separation) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height, int separation) {
 		return this.addSlotGrid(inventory, xPosition, yPosition, width, height, separation, separation, Slot::new);
 	}
 
 	/**
-	 * Adds a grid of simple {@link Slot} instances to this {@link AbstractContainer}, based on the provided parameters.
+	 * Adds a grid of simple {@link Slot} instances to this {@link SimpleMenu}, based on the provided parameters.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
@@ -278,17 +278,17 @@ public abstract class AbstractContainer extends Container {
 	 * @param verticalSeparation - The vertical separation between individual {@link Slot} within the grid
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation) {
 		return this.addSlotGrid(inventory, xPosition, yPosition, width, height, horizontalSeparation, verticalSeparation, Slot::new);
 	}
 
 	/**
-	 * Adds a grid of {@link Slot}-derived instances to this {@link AbstractContainer}, based on the provided parameters, with a default x and y separation between {@link Slot} elements of {@value AbstractContainer#DEFAULT_SLOT_SEPARATION}.
+	 * Adds a grid of {@link Slot}-derived instances to this {@link SimpleMenu}, based on the provided parameters, with a default x and y separation between {@link Slot} elements of {@value SimpleMenu#DEFAULT_SLOT_SEPARATION}.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
@@ -296,17 +296,17 @@ public abstract class AbstractContainer extends Container {
 	 * @param factory - A means of constructing new {@link Slot}-derived instances of the desired type.
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height, ISlotFactory<S> factory) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height, ISlotFactory<S> factory) {
 		return this.addSlotGrid(inventory, xPosition, yPosition, width, height, DEFAULT_SLOT_SEPARATION, factory);
 	}
 
 	/**
-	 * Adds a grid of {@link Slot}-derived instances to this {@link AbstractContainer}, based on the provided parameters, with an equivalent x and y separation between {@link Slot} elements.
+	 * Adds a grid of {@link Slot}-derived instances to this {@link SimpleMenu}, based on the provided parameters, with an equivalent x and y separation between {@link Slot} elements.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
@@ -315,17 +315,17 @@ public abstract class AbstractContainer extends Container {
 	 * @param factory - A means of constructing new {@link Slot}-derived instances of the desired type.
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height, int separation, ISlotFactory<S> factory) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height, int separation, ISlotFactory<S> factory) {
 		return this.addSlotGrid(inventory, xPosition, yPosition, width, height, separation, separation, factory);
 	}
 
 	/**
-	 * Adds a grid of {@link Slot}-derived instances to this {@link AbstractContainer}, based on the provided parameters.
+	 * Adds a grid of {@link Slot}-derived instances to this {@link SimpleMenu}, based on the provided parameters.
 	 * <p>
-	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link AbstractContainer} as well as the returned {@link SlotGroup}.
+	 * For each position within a grid, the provided {@link ISlotFactory} will be invoked, and the received instance will be added to this {@link SimpleMenu} as well as the returned {@link SlotGroup}.
 	 *
 	 * @param <S> The actual type of the {@link Slot}-inheriting class
-	 * @param inventory - The {@link IInventory} instance that the {@link Slot} will be linked to
+	 * @param inventory - The {@link Container} instance that the {@link Slot} will be linked to
 	 * @param xPosition - The starting x position of the grid (from top left)
 	 * @param yPosition - The starting y position of the grid (from top left)
 	 * @param width - The width of the grid, in quantity of {@link Slot}
@@ -335,7 +335,7 @@ public abstract class AbstractContainer extends Container {
 	 * @param factory - A means of constructing new {@link Slot}-derived instances of the desired type.
 	 * @return A {@link SlotGroup} holding all of the newly-created {@link Slot}-derived instances.
 	 */
-	protected <S extends Slot> SlotGroup addSlotGrid(IInventory inventory, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
+	protected <S extends Slot> SlotGroup addSlotGrid(Container inventory, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
 		return this.constructGridGroup(inventory, 0, xPosition, yPosition, width, height, horizontalSeparation, verticalSeparation, factory);
 	}
 
@@ -354,7 +354,7 @@ public abstract class AbstractContainer extends Container {
 	}
 
 	/**
-	 * Calculates the axial position for an inventory slot given the starting point, ordinal of the slot along that axis, assuming the default slot separation value of {@value AbstractContainer#DEFAULT_SLOT_SEPARATION}.
+	 * Calculates the axial position for an inventory slot given the starting point, ordinal of the slot along that axis, assuming the default slot separation value of {@value SimpleMenu#DEFAULT_SLOT_SEPARATION}.
 	 * <p>
 	 * Useful for aligning individual {@link Slot} to a grid of like elements.
 	 *
@@ -363,31 +363,31 @@ public abstract class AbstractContainer extends Container {
 	 * @return A suitable position, in UI-units, for a spaced UI element.
 	 */
 	protected static final int calculateSlotPosition(int start, int axialOrdinal) {
-		return AbstractContainer.calculateSlotPosition(start, axialOrdinal, AbstractContainer.DEFAULT_SLOT_SEPARATION);
+		return SimpleMenu.calculateSlotPosition(start, axialOrdinal, SimpleMenu.DEFAULT_SLOT_SEPARATION);
 	}
 
 	/* Internal Methods */
 
-	private <S extends Slot> void addPlayerHotbarTo(SlotGroup.Builder groupBuilder, PlayerInventory inventory, int xPosition, int yPosition) {
+	private <S extends Slot> void addPlayerHotbarTo(SlotGroup.Builder groupBuilder, Inventory inventory, int xPosition, int yPosition) {
 		this.addGridToGroup(groupBuilder, inventory, 0, xPosition, yPosition, PLAYER_HOTBAR_WIDTH, PLAYER_HOTBAR_HEIGHT, DEFAULT_SLOT_SEPARATION, DEFAULT_SLOT_SEPARATION, Slot::new);
 	}
 
-	private <S extends Slot> void addPlayerInventoryTo(SlotGroup.Builder groupBuilder, PlayerInventory inventory, int xPosition, int yPosition) {
+	private <S extends Slot> void addPlayerInventoryTo(SlotGroup.Builder groupBuilder, Inventory inventory, int xPosition, int yPosition) {
 		final int indexOffset = PLAYER_HOTBAR_WIDTH * PLAYER_HOTBAR_HEIGHT;
 		this.addGridToGroup(groupBuilder, inventory, indexOffset, xPosition, yPosition, PLAYER_INVENTORY_WIDTH, PLAYER_INVENTORY_HEIGHT, DEFAULT_SLOT_SEPARATION, DEFAULT_SLOT_SEPARATION, Slot::new);
 	}
 
-	private <S extends Slot> SlotGroup constructGridGroup(IInventory inventory, int indexOffset, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
+	private <S extends Slot> SlotGroup constructGridGroup(Container inventory, int indexOffset, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
 		SlotGroup.Builder groupBuilder = SlotGroup.Builder.create(width * height);
 		this.addGridToGroup(groupBuilder, inventory, indexOffset, xPosition, yPosition, width, height, horizontalSeparation, verticalSeparation, factory);
 		return groupBuilder.build();
 	}
 
-	private <S extends Slot> void addGridToGroup(SlotGroup.Builder groupBuilder, IInventory inventory, int indexOffset, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
+	private <S extends Slot> void addGridToGroup(SlotGroup.Builder groupBuilder, Container inventory, int indexOffset, int xPosition, int yPosition, int width, int height, int horizontalSeparation, int verticalSeparation, ISlotFactory<S> factory) {
 		for (int y = 0; y < height; y += 1) {
 			for (int x = 0; x < width; x += 1) {
 				final int index = x + (y * width);
-				final S slot = factory.create(inventory, indexOffset + index, AbstractContainer.calculateSlotPosition(xPosition, x, horizontalSeparation), AbstractContainer.calculateSlotPosition(yPosition, y, verticalSeparation));
+				final S slot = factory.create(inventory, indexOffset + index, SimpleMenu.calculateSlotPosition(xPosition, x, horizontalSeparation), SimpleMenu.calculateSlotPosition(yPosition, y, verticalSeparation));
 				this.addAndGroup(groupBuilder, slot);
 			}
 		}
@@ -409,13 +409,13 @@ public abstract class AbstractContainer extends Container {
 		 * <p>
 		 * Implementors should take care to return unique instances each time this method is invoked.
 		 *
-		 * @param inventory - The {@link IInventory} that the {@link Slot} is linked to
+		 * @param inventory - The {@link Container} that the {@link Slot} is linked to
 		 * @param index - The index of the slot (distinguished from the number within the container)
 		 * @param xPos - The x-position of the {@link Slot}
 		 * @param yPos - The y-position of the {@link Slot}
 		 * @return A suitable {@link Slot}-derived instance
 		 */
-		public S create(IInventory inventory, int index, int xPos, int yPos);
+		public S create(Container inventory, int index, int xPos, int yPos);
 
 	}
 
